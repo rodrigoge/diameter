@@ -23,7 +23,7 @@ public class MockBuilder {
     }
 
     public static UserRequest createInvalidUserRequest() {
-        return new UserRequest("John Doe", "john.doe@mail.com", "1234");
+        return new UserRequest(null, "john.doe@mail.com", "1234");
     }
 
     public static UserResponse createUserResponse() {

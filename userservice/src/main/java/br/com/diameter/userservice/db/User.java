@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,17 +22,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column
-    @NotBlank(message = "Name must not be empty")
+    @Column(length = 200, nullable = false)
     private String name;
 
-    @Column
-    @Email(message = "E-mail is not valid")
-    @NotBlank(message = "E-mail must not be empty")
-    @Size(min = 10, max = 200, message = "E-mail must be between {min} and {max} characters")
+    @Column(length = 200, nullable = false, unique = true)
     private String email;
 
-    @Column
-    @NotBlank(message = "Password must not be empty")
+    @Column(nullable = false)
     private String password;
 }
