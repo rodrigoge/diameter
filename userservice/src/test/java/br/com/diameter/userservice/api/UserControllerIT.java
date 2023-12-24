@@ -1,0 +1,70 @@
+package br.com.diameter.userservice.api;
+
+import br.com.diameter.userservice.builders.MockBuilder;
+import br.com.diameter.userservice.db.UserRepository;
+import br.com.diameter.userservice.models.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Objects;
+
+@AutoConfigureMockMvc
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class UserControllerIT {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private static HttpHeaders httpHeaders;
+
+    @BeforeAll
+    static void init() {
+        httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    void shouldCreateUser_WhenIntegrationTestUserController() throws JsonProcessingException {
+        var userRequest = MockBuilder.createUserRequest();
+        var entity = new HttpEntity<>(objectMapper.writeValueAsString(userRequest), httpHeaders);
+        var response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/v1/users",
+                HttpMethod.POST,
+                entity,
+                UserResponse.class
+        );
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.CREATED);
+        var responseBody = Objects.requireNonNull(response.getBody());
+        Assertions.assertEquals(responseBody.name(), "John Doe");
+        Assertions.assertEquals(responseBody.email(), "john.doe@mail.com");
+    }
+}

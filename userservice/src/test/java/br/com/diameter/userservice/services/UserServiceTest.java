@@ -31,7 +31,7 @@ public class UserServiceTest {
     private UserUtils userUtils;
 
     @Test
-    void shouldCreateUser() {
+    void shouldCreateUser_WhenPostUserObject() {
         var user = MockBuilder.createUser();
         var userRequest = MockBuilder.createUserRequest();
         Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.empty());
@@ -48,6 +48,15 @@ public class UserServiceTest {
         var user = MockBuilder.createUser();
         var userRequest = MockBuilder.createUserRequest();
         Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.of(user));
+        var customException = Assertions.catchThrowable(() -> userService.createUser(userRequest));
+        Assertions.assertThat(customException).isNotNull();
+        Assertions.assertThat(customException).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void shouldThrowException_WhenPasswordIsShorterCharacters() {
+        var userRequest = MockBuilder.createInvalidUserRequest();
+        Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.empty());
         var customException = Assertions.catchThrowable(() -> userService.createUser(userRequest));
         Assertions.assertThat(customException).isNotNull();
         Assertions.assertThat(customException).isInstanceOf(CustomException.class);

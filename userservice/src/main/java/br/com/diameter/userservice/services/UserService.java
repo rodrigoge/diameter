@@ -36,7 +36,13 @@ public class UserService {
                     LocalDateTime.now()
             );
         }
-        userUtils.validatePasswordLength(userRequest.password());
+        if (userRequest.password().length() < 8) {
+            throw new CustomException(
+                    HttpStatus.BAD_REQUEST,
+                    "Password shorter than 8 characters",
+                    LocalDateTime.now()
+            );
+        }
         log.info("Mapping and saving user request into database");
         var user = userMapper.toUser(userRequest);
         userUtils.encryptPassword(user);
