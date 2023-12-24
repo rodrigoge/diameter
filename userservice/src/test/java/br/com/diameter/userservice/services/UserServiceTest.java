@@ -4,20 +4,21 @@ import br.com.diameter.userservice.builders.MockBuilder;
 import br.com.diameter.userservice.db.User;
 import br.com.diameter.userservice.db.UserRepository;
 import br.com.diameter.userservice.exceptions.BadRequestException;
-import br.com.diameter.userservice.exceptions.InternalServerErrorException;
-import br.com.diameter.userservice.exceptions.NotFoundException;
 import br.com.diameter.userservice.mappers.UserMapper;
 import br.com.diameter.userservice.models.UserRequest;
 import br.com.diameter.userservice.utils.UserUtils;
+import jakarta.validation.ConstraintViolation;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.UUID;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
