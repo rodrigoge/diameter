@@ -1,9 +1,11 @@
 package br.com.diameter.userservice.builders;
 
 import br.com.diameter.userservice.db.User;
+import br.com.diameter.userservice.models.GetUsersResponse;
 import br.com.diameter.userservice.models.UserRequest;
 import br.com.diameter.userservice.models.UserResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public class MockBuilder {
@@ -24,5 +26,10 @@ public class MockBuilder {
 
     public static UserResponse createUserResponse() {
         return new UserResponse("John Doe", "john.doe@mail.com");
+    }
+
+    public static GetUsersResponse createUsersResponse() {
+        var userResponse = new UserResponse("John Doe", "john.doe@mail.com");
+        return new GetUsersResponse(List.of(userResponse), 1);
     }
 }

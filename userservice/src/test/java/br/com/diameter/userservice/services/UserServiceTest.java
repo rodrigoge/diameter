@@ -3,22 +3,27 @@ package br.com.diameter.userservice.services;
 import br.com.diameter.userservice.builders.MockBuilder;
 import br.com.diameter.userservice.db.User;
 import br.com.diameter.userservice.db.UserRepository;
+import br.com.diameter.userservice.enums.OrderEnum;
+import br.com.diameter.userservice.enums.SortEnum;
 import br.com.diameter.userservice.exceptions.BadRequestException;
 import br.com.diameter.userservice.mappers.UserMapper;
+import br.com.diameter.userservice.models.GetUsersRequest;
 import br.com.diameter.userservice.models.UserRequest;
-import br.com.diameter.userservice.utils.UserUtils;
-import jakarta.validation.ConstraintViolation;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.Set;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -33,7 +38,19 @@ public class UserServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private UserUtils userUtils;
+    private EntityManager entityManager;
+
+    @Mock
+    private CriteriaQuery<User> criteriaQuery;
+
+    @Mock
+    private CriteriaBuilder criteriaBuilder;
+
+    @Mock
+    private Root<User> root;
+
+    @Mock
+    private TypedQuery<User> typedQuery;
 
     @Test
     void shouldCreateUser_WhenPostUserObject() {
@@ -65,5 +82,19 @@ public class UserServiceTest {
         var customException = Assertions.catchThrowable(() -> userService.createUser(userRequest));
         Assertions.assertThat(customException).isNotNull();
         Assertions.assertThat(customException).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void shouldGetAllUsers_WhenGetUsersWithoutParameters() {
+        var user = MockBuilder.createUser();
+        var emptyUserRequest = new GetUsersRequest(null, null, 0, 25, SortEnum.NAME, OrderEnum.ASC);
+        var userResponse = MockBuilder.createUserResponse();
+        var usersResponse = MockBuilder.createUsersResponse();
+        Mockito.when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
+        Mockito.when(criteriaBuilder.createQuery(User.class)).thenReturn(criteriaQuery);
+        Mockito.when(criteriaQuery.from(User.class)).thenReturn(root);
+        Mockito.when(entityManager.createQuery(criteriaQuery).setMaxResults(emptyUserRequest.limit()).setFirstResult(emptyUserRequest.offset() * emptyUserRequest.limit())).thenReturn(typedQuery);
+        Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        Assertions.assertThat(userService.getUsers(emptyUserRequest)).isEqualTo(usersResponse);
     }
 }
