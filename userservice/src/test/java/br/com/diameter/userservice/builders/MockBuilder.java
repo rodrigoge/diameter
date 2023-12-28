@@ -1,6 +1,9 @@
 package br.com.diameter.userservice.builders;
 
 import br.com.diameter.userservice.db.User;
+import br.com.diameter.userservice.enums.OrderEnum;
+import br.com.diameter.userservice.enums.SortEnum;
+import br.com.diameter.userservice.models.GetUsersRequest;
 import br.com.diameter.userservice.models.GetUsersResponse;
 import br.com.diameter.userservice.models.UserRequest;
 import br.com.diameter.userservice.models.UserResponse;
@@ -26,6 +29,10 @@ public class MockBuilder {
 
     public static UserResponse createUserResponse() {
         return new UserResponse("John Doe", "john.doe@mail.com");
+    }
+
+    public static GetUsersRequest createUsersRequest() {
+        return new GetUsersRequest("John Doe", "john.doe@mail.com", 0, 25, SortEnum.NAME, OrderEnum.ASC);
     }
 
     public static GetUsersResponse createUsersResponse() {

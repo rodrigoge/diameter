@@ -9,6 +9,7 @@ import br.com.diameter.userservice.exceptions.BadRequestException;
 import br.com.diameter.userservice.mappers.UserMapper;
 import br.com.diameter.userservice.models.GetUsersRequest;
 import br.com.diameter.userservice.models.UserRequest;
+import br.com.diameter.userservice.utils.UserUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -52,6 +53,9 @@ public class UserServiceTest {
     @Mock
     private TypedQuery<User> typedQuery;
 
+    @Mock
+    private UserUtils userUtils;
+
     @Test
     void shouldCreateUser_WhenPostUserObject() {
         var user = MockBuilder.createUser();
@@ -93,8 +97,28 @@ public class UserServiceTest {
         Mockito.when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
         Mockito.when(criteriaBuilder.createQuery(User.class)).thenReturn(criteriaQuery);
         Mockito.when(criteriaQuery.from(User.class)).thenReturn(root);
-        Mockito.when(entityManager.createQuery(criteriaQuery).setMaxResults(emptyUserRequest.limit()).setFirstResult(emptyUserRequest.offset() * emptyUserRequest.limit())).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).setMaxResults(ArgumentMatchers.anyInt())).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).setFirstResult(ArgumentMatchers.anyInt())).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).getResultList()).thenReturn(List.of(user));
         Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         Assertions.assertThat(userService.getUsers(emptyUserRequest)).isEqualTo(usersResponse);
+    }
+
+    @Test
+    void shouldGetAllUsers_WhenGetUsersWithParametersAndDescOrdering() {
+        var user = MockBuilder.createUser();
+        var getUserRequest = new GetUsersRequest("John Doe", "john.doe@mail.com", 0, 25, SortEnum.NAME, OrderEnum.DESC);
+        var userResponse = MockBuilder.createUserResponse();
+        var usersResponse = MockBuilder.createUsersResponse();
+        Mockito.when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
+        Mockito.when(criteriaBuilder.createQuery(User.class)).thenReturn(criteriaQuery);
+        Mockito.when(criteriaQuery.from(User.class)).thenReturn(root);
+        Mockito.when(entityManager.createQuery(criteriaQuery)).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).setMaxResults(ArgumentMatchers.anyInt())).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).setFirstResult(ArgumentMatchers.anyInt())).thenReturn(typedQuery);
+        Mockito.when(entityManager.createQuery(criteriaQuery).getResultList()).thenReturn(List.of(user));
+        Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        Assertions.assertThat(userService.getUsers(getUserRequest)).isEqualTo(usersResponse);
     }
 }

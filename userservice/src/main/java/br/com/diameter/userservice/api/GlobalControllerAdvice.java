@@ -1,9 +1,9 @@
 package br.com.diameter.userservice.api;
 
 import br.com.diameter.userservice.exceptions.BadRequestException;
+import br.com.diameter.userservice.exceptions.ErrorInfoException;
 import br.com.diameter.userservice.exceptions.InternalServerErrorException;
 import br.com.diameter.userservice.exceptions.NotFoundException;
-import br.com.diameter.userservice.exceptions.ErrorInfoException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

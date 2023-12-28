@@ -2,6 +2,7 @@ package br.com.diameter.userservice.api;
 
 import br.com.diameter.userservice.builders.MockBuilder;
 import br.com.diameter.userservice.db.UserRepository;
+import br.com.diameter.userservice.models.GetUsersResponse;
 import br.com.diameter.userservice.models.UserResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Objects;
 
 @AutoConfigureMockMvc
@@ -66,5 +68,21 @@ public class UserControllerIT {
         var responseBody = Objects.requireNonNull(response.getBody());
         Assertions.assertEquals(responseBody.name(), "John Doe");
         Assertions.assertEquals(responseBody.email(), "john.doe@mail.com");
+    }
+
+    @Test
+    void shouldGetUsers_WhenIntegrationTestUserController() {
+        var userResponse = MockBuilder.createUserResponse();
+        var entity = new HttpEntity<>(null, httpHeaders);
+        var response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/v1/users",
+                HttpMethod.GET,
+                entity,
+                GetUsersResponse.class
+        );
+        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        var responseBody = Objects.requireNonNull(response.getBody());
+        Assertions.assertEquals(responseBody.users(), List.of(userResponse));
+        Assertions.assertEquals(responseBody.totalNumberOfRecords(), 1);
     }
 }

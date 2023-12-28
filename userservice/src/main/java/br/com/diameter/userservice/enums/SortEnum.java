@@ -7,9 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SortEnum {
 
-    ID("Id"),
-    NAME("Name"),
-    EMAIL("E-mail");
-
-    private final String description;
+    ID,
+    NAME,
+    EMAIL;
 }

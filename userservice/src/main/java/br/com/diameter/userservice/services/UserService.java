@@ -56,27 +56,34 @@ public class UserService {
     }
 
     private void verifyEmailAlreadyExists(User userWithEmailVerified) {
+        log.info("Verifying if e-mail already exists");
         if (userWithEmailVerified != null && !userWithEmailVerified.getEmail().isEmpty()) {
             throw new BadRequestException("E-mail already exists");
         }
     }
 
     private void verifyPasswordLength(UserRequest user) {
+        log.info("Verifying password length");
         if (user != null && user.password() != null && user.password().length() < 8) {
             throw new BadRequestException("Password shorter than 8 characters");
         }
     }
 
     public GetUsersResponse getUsers(GetUsersRequest request) {
+        log.info("Starting the get users flow");
         var users = buildParams(request);
         var usersResponse = mapperToResponse(users);
-        return new GetUsersResponse(usersResponse, usersResponse.size());
+        var response = new GetUsersResponse(usersResponse, usersResponse.size());
+        log.info("Finishing the get users flow");
+        return response;
     }
 
     private List<User> buildParams(GetUsersRequest request) {
+        log.info("Building request parameters to get users");
         var criteriaBuilder = entityManager.getCriteriaBuilder();
         var criteriaQuery = criteriaBuilder.createQuery(User.class);
         var root = criteriaQuery.from(User.class);
+        log.info("Building predicates with request");
         var predicates = new ArrayList<Predicate>();
         if (StringUtils.hasText(request.name())) {
             predicates.add(criteriaBuilder.equal(root.get("name"), request.name()));
@@ -86,6 +93,7 @@ public class UserService {
         }
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
         orderingFetchUsers(request, criteriaBuilder, criteriaQuery, root);
+        log.info("Finishing request parameters to get users");
         return entityManager
                 .createQuery(criteriaQuery)
                 .setMaxResults(request.limit())
@@ -94,10 +102,12 @@ public class UserService {
     }
 
     private List<UserResponse> mapperToResponse(List<User> users) {
+        log.info("Mapping get users response");
         return users.stream().map(userMapper::toUserResponse).toList();
     }
 
     private void orderingFetchUsers(GetUsersRequest request, CriteriaBuilder criteriaBuilder, CriteriaQuery<User> criteriaQuery, Root<User> root) {
+        log.info("Ordering fetch users request");
         if(request.orderEnum() != null) {
             if("ASC".equalsIgnoreCase(request.orderEnum().getDescription())) {
                 criteriaQuery.orderBy(criteriaBuilder.asc(root.get(request.orderEnum().getDescription())));
