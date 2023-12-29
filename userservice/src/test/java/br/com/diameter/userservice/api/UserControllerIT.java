@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.Objects;
 
 @AutoConfigureMockMvc
@@ -72,7 +71,6 @@ public class UserControllerIT {
 
     @Test
     void shouldGetUsers_WhenIntegrationTestUserController() {
-        var userResponse = MockBuilder.createUserResponse();
         var entity = new HttpEntity<>(null, httpHeaders);
         var response = testRestTemplate.exchange(
                 "http://localhost:" + port + "/api/v1/users",
@@ -80,9 +78,10 @@ public class UserControllerIT {
                 entity,
                 GetUsersResponse.class
         );
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        var usersList = MockBuilder.createUsersResponse();
         var responseBody = Objects.requireNonNull(response.getBody());
-        Assertions.assertEquals(responseBody.users(), List.of(userResponse));
-        Assertions.assertEquals(responseBody.totalNumberOfRecords(), 1);
+        Assertions.assertEquals(responseBody.users(), usersList.users());
+        Assertions.assertEquals(responseBody.totalNumberOfRecords(), usersList.totalNumberOfRecords());
     }
 }

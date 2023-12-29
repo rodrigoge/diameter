@@ -110,10 +110,10 @@ public class UserService {
         log.info("Ordering fetch users request");
         if(request.orderEnum() != null) {
             if("ASC".equalsIgnoreCase(request.orderEnum().getDescription())) {
-                criteriaQuery.orderBy(criteriaBuilder.asc(root.get(request.orderEnum().getDescription())));
+                criteriaQuery.orderBy(criteriaBuilder.asc(root.get("name")));
             }
             if("DESC".equalsIgnoreCase(request.orderEnum().getDescription())) {
-                criteriaQuery.orderBy(criteriaBuilder.desc(root.get(request.orderEnum().getDescription())));
+                criteriaQuery.orderBy(criteriaBuilder.desc(root.get("name")));
             }
         }
     }

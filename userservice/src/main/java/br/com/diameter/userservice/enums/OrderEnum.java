@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrderEnum {
 
-    ASC("Asc"),
-    DESC("Desc");
+    ASC("ASC"),
+    DESC("DESC");
 
     private final String description;
 }
