@@ -86,10 +86,10 @@ public class UserService {
         log.info("Building predicates with request");
         var predicates = new ArrayList<Predicate>();
         if (StringUtils.hasText(request.name())) {
-            predicates.add(criteriaBuilder.equal(root.get("name"), request.name()));
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.name().toLowerCase() + "%"));
         }
         if (StringUtils.hasText(request.email())) {
-            predicates.add(criteriaBuilder.equal(root.get("email"), request.email()));
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + request.email().toLowerCase() + "%"));
         }
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
         orderingFetchUsers(request, criteriaBuilder, criteriaQuery, root);
