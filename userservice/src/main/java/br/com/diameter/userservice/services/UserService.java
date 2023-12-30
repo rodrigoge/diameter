@@ -3,6 +3,7 @@ package br.com.diameter.userservice.services;
 import br.com.diameter.userservice.db.User;
 import br.com.diameter.userservice.db.UserRepository;
 import br.com.diameter.userservice.exceptions.BadRequestException;
+import br.com.diameter.userservice.exceptions.NotFoundException;
 import br.com.diameter.userservice.mappers.UserMapper;
 import br.com.diameter.userservice.models.GetUsersRequest;
 import br.com.diameter.userservice.models.GetUsersResponse;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Log4j2
@@ -116,5 +118,14 @@ public class UserService {
                 criteriaQuery.orderBy(criteriaBuilder.desc(root.get("name")));
             }
         }
+    }
+
+    public UserResponse getUserById(UUID userId) {
+        log.info("Starting the get user by id flow");
+        var user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found in database"));
+        log.info("Mapping user response will be returned");
+        var userResponse = userMapper.toUserResponse(user);
+        log.info("Finishing the create user flow");
+        return userResponse;
     }
 }

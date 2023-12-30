@@ -1,6 +1,8 @@
 package br.com.diameter.userservice.api;
 
 import br.com.diameter.userservice.builders.MockBuilder;
+import br.com.diameter.userservice.enums.OrderEnum;
+import br.com.diameter.userservice.enums.SortEnum;
 import br.com.diameter.userservice.services.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,10 +29,10 @@ public class UserControllerTest {
         var userRequest = MockBuilder.createUserRequest();
         var userResponse = MockBuilder.createUserResponse();
         Mockito.when(userService.createUser(userRequest)).thenReturn(userResponse);
-        var response = userService.createUser(userRequest);
-        Assertions.assertThat(response).isNotNull();
-        Assertions.assertThat(response.name()).isEqualTo(userResponse.name());
-        Assertions.assertThat(response.email()).isEqualTo(userResponse.email());
+        var response = userController.createUser(userRequest);
+        Assertions.assertThat(response.getBody()).isNotNull();
+        Assertions.assertThat(response.getBody().name()).isEqualTo(userResponse.name());
+        Assertions.assertThat(response.getBody().email()).isEqualTo(userResponse.email());
     }
 
     @Test
@@ -39,9 +41,9 @@ public class UserControllerTest {
         var response = MockBuilder.createUsersResponse();
         var userResponse = MockBuilder.createUserResponse();
         Mockito.when(userService.getUsers(request)).thenReturn(response);
-        var usersResponse = userService.getUsers(request);
-        Assertions.assertThat(usersResponse).isNotNull();
-        Assertions.assertThat(usersResponse.users()).isEqualTo(List.of(userResponse));
-        Assertions.assertThat(usersResponse.totalNumberOfRecords()).isEqualTo(1);
+        var usersResponse = userController.getUsers("John Doe", "john.doe@mail.com", 0, 25, SortEnum.NAME, OrderEnum.ASC);
+        Assertions.assertThat(usersResponse.getBody()).isNotNull();
+        Assertions.assertThat(usersResponse.getBody().users()).isEqualTo(List.of(userResponse));
+        Assertions.assertThat(usersResponse.getBody().totalNumberOfRecords()).isEqualTo(1);
     }
 }

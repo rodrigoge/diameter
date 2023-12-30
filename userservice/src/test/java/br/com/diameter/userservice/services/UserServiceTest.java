@@ -25,6 +25,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -120,5 +122,15 @@ public class UserServiceTest {
         Mockito.when(entityManager.createQuery(criteriaQuery).getResultList()).thenReturn(List.of(user));
         Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         Assertions.assertThat(userService.getUsers(getUserRequest)).isEqualTo(usersResponse);
+    }
+
+    @Test
+    void shouldGetUserById_WhenSendUserIdWithPathParameter() {
+        var uuid = UUID.fromString("c0f0e810-06a9-4bf5-828f-380f71d38a8b");
+        var user = MockBuilder.createUser();
+        Mockito.when(userRepository.findById(uuid)).thenReturn(Optional.ofNullable(user));
+        var userResponse = MockBuilder.createUserResponse();
+        Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        Assertions.assertThat(userService.getUserById(uuid)).isEqualTo(userResponse);
     }
 }

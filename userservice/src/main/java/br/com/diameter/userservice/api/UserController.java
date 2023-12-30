@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 @RestController
@@ -47,6 +49,14 @@ public class UserController {
         log.info("Receiving request for get users");
         var request = new GetUsersRequest(name, email, offset, limit, sort, order);
         var response = userService.getUsers(request);
+        log.info("Sending response and finishing get users flow");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID userId) {
+        log.info("Receiving request for get user by id");
+        var response = userService.getUserById(userId);
         log.info("Sending response and finishing get users flow");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
