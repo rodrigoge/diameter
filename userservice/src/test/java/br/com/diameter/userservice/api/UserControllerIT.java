@@ -100,4 +100,20 @@ public class UserControllerIT {
         Assertions.assertNull(responseBody.name());
         Assertions.assertNull(responseBody.email());
     }
+
+    @Test
+    void shouldUpdateUserById_WhenIntegrationTestUserController() throws JsonProcessingException {
+        var userId = UUID.randomUUID();
+        var userRequest = MockBuilder.createUserRequest();
+        var entity = new HttpEntity<>(objectMapper.writeValueAsString(userRequest), httpHeaders);
+        var response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/v1/users/" + userId,
+                HttpMethod.PUT,
+                entity,
+                UserResponse.class
+        );
+        var responseBody = Objects.requireNonNull(response.getBody());
+        Assertions.assertNull(responseBody.name());
+        Assertions.assertNull(responseBody.email());
+    }
 }

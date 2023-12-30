@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,6 +58,14 @@ public class UserController {
         log.info("Receiving request for get user by id");
         var response = userService.getUserById(userId);
         log.info("Sending response and finishing get users flow");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID userId, @Valid @RequestBody UserRequest userRequest) {
+        log.info("Receiving request for update user by id");
+        var response = userService.updateUser(userId, userRequest);
+        log.info("Sending response and finishing update user flow");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

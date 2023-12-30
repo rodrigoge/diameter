@@ -133,4 +133,18 @@ public class UserServiceTest {
         Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         Assertions.assertThat(userService.getUserById(uuid)).isEqualTo(userResponse);
     }
+
+    @Test
+    void shouldUpdateUser_WhenPutUserObject() {
+        var userId = UUID.fromString("c0f0e810-06a9-4bf5-828f-380f71d38a8b");
+        var user = MockBuilder.createUser();
+        var userRequest = MockBuilder.createUserRequest();
+        var userSaved = new User(userId, userRequest.name(), userRequest.email(), userRequest.password());
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        var userMapped = MockBuilder.createUser();
+        Mockito.when(userRepository.save(userSaved)).thenReturn(userMapped);
+        var userResponse = MockBuilder.createUserResponse();
+        Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        Assertions.assertThat(userService.updateUser(userId, userRequest)).isEqualTo(userResponse);
+    }
 }

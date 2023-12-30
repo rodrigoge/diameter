@@ -56,4 +56,16 @@ public class UserControllerTest {
         Assertions.assertThat(usersResponse.getBody().name()).isEqualTo(response.name());
         Assertions.assertThat(usersResponse.getBody().email()).isEqualTo(response.email());
     }
+
+    @Test
+    void shouldUpdateUserById_When_UnitTestUserController() {
+        var userId = MockBuilder.createUser().getId();
+        var userRequest = MockBuilder.createUserRequest();
+        var userResponse = MockBuilder.createUserResponse();
+        Mockito.when(userService.updateUser(userId, userRequest)).thenReturn(userResponse);
+        var response = userController.updateUser(userId, userRequest);
+        Assertions.assertThat(response.getBody()).isNotNull();
+        Assertions.assertThat(response.getBody().name()).isEqualTo(userResponse.name());
+        Assertions.assertThat(response.getBody().email()).isEqualTo(userResponse.email());
+    }
 }

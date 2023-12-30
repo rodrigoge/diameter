@@ -128,4 +128,30 @@ public class UserService {
         log.info("Finishing the create user flow");
         return userResponse;
     }
+
+    @Transactional
+    public UserResponse updateUser(UUID userId, UserRequest userRequest) {
+        log.info("Starting the update user flow");
+        var optionalUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found in database"));
+        if(!userRequest.email().equals(optionalUser.getEmail())) {
+            var userWithEmailVerified = userRepository.findByEmail(userRequest.email());
+            verifyEmailAlreadyExists(userWithEmailVerified);
+        }
+        verifyPasswordLength(userRequest);
+        log.info("Setting and updating user request into database");
+        var user = mapUserToUpdate(userId, userRequest, optionalUser);
+        userUtils.encryptPassword(user);
+        var userSaved = userRepository.save(user);
+        log.info("Mapping user response will be returned");
+        var userResponse = userMapper.toUserResponse(userSaved);
+        log.info("Finishing the update user flow");
+        return userResponse;
+    }
+
+    private User mapUserToUpdate(UUID userId, UserRequest userRequest, User user) {
+        var name = userRequest.name() == null || userRequest.name().isEmpty() ? user.getName() : userRequest.name();
+        var email = userRequest.email() == null || userRequest.email().isEmpty() ? user.getEmail() : userRequest.email();
+        var password = userRequest.password() == null || userRequest.password().isEmpty() ? user.getPassword() : userRequest.password();
+        return new User(userId, name, email, password);
+    }
 }
