@@ -7,7 +7,6 @@ import br.com.diameter.userservice.services.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -45,5 +44,16 @@ public class UserControllerTest {
         Assertions.assertThat(usersResponse.getBody()).isNotNull();
         Assertions.assertThat(usersResponse.getBody().users()).isEqualTo(List.of(userResponse));
         Assertions.assertThat(usersResponse.getBody().totalNumberOfRecords()).isEqualTo(1);
+    }
+
+    @Test
+    void shouldGetUserById_WhenUnitTestUserController() {
+        var userId = MockBuilder.createUser().getId();
+        var response = MockBuilder.createUserResponse();
+        Mockito.when(userService.getUserById(userId)).thenReturn(response);
+        var usersResponse = userController.getUserById(userId);
+        Assertions.assertThat(usersResponse.getBody()).isNotNull();
+        Assertions.assertThat(usersResponse.getBody().name()).isEqualTo(response.name());
+        Assertions.assertThat(usersResponse.getBody().email()).isEqualTo(response.email());
     }
 }

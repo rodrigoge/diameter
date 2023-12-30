@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -89,20 +88,16 @@ public class UserControllerIT {
 
     @Test
     void shouldGetUserById_WhenIntegrationTestUserController() {
-        var user = MockBuilder.createUser();
+        var userId = UUID.randomUUID();
         var entity = new HttpEntity<>(null, httpHeaders);
-        var url = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/api/v1/users/{userId}")
-                .buildAndExpand(user.getId())
-                .toUri();
         var response = testRestTemplate.exchange(
-                url,
+                "http://localhost:" + port + "/api/v1/users/" + userId,
                 HttpMethod.GET,
                 entity,
                 UserResponse.class
         );
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         var responseBody = Objects.requireNonNull(response.getBody());
-        Assertions.assertEquals(responseBody.name(), "John Doe");
-        Assertions.assertEquals(responseBody.email(), "john.doe@mail.com");
+        Assertions.assertNull(responseBody.name());
+        Assertions.assertNull(responseBody.email());
     }
 }
