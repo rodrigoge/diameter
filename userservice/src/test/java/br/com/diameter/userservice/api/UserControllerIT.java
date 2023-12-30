@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @AutoConfigureMockMvc
@@ -115,5 +116,20 @@ public class UserControllerIT {
         var responseBody = Objects.requireNonNull(response.getBody());
         Assertions.assertNull(responseBody.name());
         Assertions.assertNull(responseBody.email());
+    }
+
+    @Test
+    void shouldDeleteUserById_WhenIntegrationTestUserController() {
+        var user = MockBuilder.createUser();
+        var userId = user.getId();
+        userRepository.save(user);
+        var entity = new HttpEntity<>(null, httpHeaders);
+        testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/v1/users/" + userId,
+                HttpMethod.DELETE,
+                entity,
+                String.class
+        );
+        Assertions.assertEquals(userRepository.findById(user.getId()), Optional.of(user));
     }
 }

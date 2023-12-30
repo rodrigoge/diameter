@@ -68,4 +68,13 @@ public class UserControllerTest {
         Assertions.assertThat(response.getBody().name()).isEqualTo(userResponse.name());
         Assertions.assertThat(response.getBody().email()).isEqualTo(userResponse.email());
     }
+
+    @Test
+    void shouldDeleteUserById_WhenUnitTestUserController() {
+        var userId = MockBuilder.createUser().getId();
+        Mockito.when(userService.deleteUser(userId)).thenReturn("User deleted successfully");
+        var response = userController.deleteUser(userId);
+        Assertions.assertThat(response.getBody()).isNotNull();
+        Assertions.assertThat(response.getBody()).isEqualTo("User deleted successfully");
+    }
 }

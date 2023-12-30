@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -66,6 +67,14 @@ public class UserController {
         log.info("Receiving request for update user by id");
         var response = userService.updateUser(userId, userRequest);
         log.info("Sending response and finishing update user flow");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable UUID userId) {
+        log.info("Receiving request for delete user by id");
+        var response = userService.deleteUser(userId);
+        log.info("Sending response and finishing delete user flow");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

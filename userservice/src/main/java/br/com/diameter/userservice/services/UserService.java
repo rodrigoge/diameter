@@ -154,4 +154,12 @@ public class UserService {
         var password = userRequest.password() == null || userRequest.password().isEmpty() ? user.getPassword() : userRequest.password();
         return new User(userId, name, email, password);
     }
+
+    public String deleteUser(UUID userId) {
+        log.info("Starting the delete user flow");
+        if(userId == null) throw new BadRequestException("Failed to delete user, because id is null or empty");
+        if(userRepository.findById(userId).isEmpty()) throw new BadRequestException("This user is not exists into database");
+        userRepository.deleteById(userId);
+        return "User deleted successfully";
+    }
 }

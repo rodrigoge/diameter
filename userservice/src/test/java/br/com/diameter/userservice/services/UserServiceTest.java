@@ -147,4 +147,15 @@ public class UserServiceTest {
         Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
         Assertions.assertThat(userService.updateUser(userId, userRequest)).isEqualTo(userResponse);
     }
+
+    @Test
+    void shouldDeleteUser_WhenDeleteUserObject() {
+        var userId = UUID.fromString("c0f0e810-06a9-4bf5-828f-380f71d38a8b");
+        var user = MockBuilder.createUser();
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.doNothing().when(userRepository).deleteById(userId);
+        userService.deleteUser(userId);
+        Mockito.verify(userRepository, Mockito.times(1)).deleteById(userId);
+        Assertions.assertThat(userService.deleteUser(userId)).isEqualTo("User deleted successfully");
+    }
 }
