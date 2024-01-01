@@ -44,8 +44,7 @@ public class UserService {
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
         log.info("Starting the create user flow");
-        var userWithEmailVerified = userRepository.findByEmail(userRequest.email());
-        verifyEmailAlreadyExists(userWithEmailVerified);
+        userRepository.findByEmail(userRequest.email()).orElseThrow(() -> new BadRequestException("E-mail already exists"));
         verifyPasswordLength(userRequest);
         log.info("Mapping and saving user request into database");
         var user = userMapper.toUser(userRequest);
@@ -55,13 +54,6 @@ public class UserService {
         var userResponse = userMapper.toUserResponse(userSaved);
         log.info("Finishing the create user flow");
         return userResponse;
-    }
-
-    private void verifyEmailAlreadyExists(User userWithEmailVerified) {
-        log.info("Verifying if e-mail already exists");
-        if (userWithEmailVerified != null && !userWithEmailVerified.getEmail().isEmpty()) {
-            throw new BadRequestException("E-mail already exists");
-        }
     }
 
     private void verifyPasswordLength(UserRequest user) {
@@ -133,10 +125,7 @@ public class UserService {
     public UserResponse updateUser(UUID userId, UserRequest userRequest) {
         log.info("Starting the update user flow");
         var optionalUser = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found in database"));
-        if(!userRequest.email().equals(optionalUser.getEmail())) {
-            var userWithEmailVerified = userRepository.findByEmail(userRequest.email());
-            verifyEmailAlreadyExists(userWithEmailVerified);
-        }
+        if(!userRequest.email().equals(optionalUser.getEmail())) userRepository.findByEmail(userRequest.email()).orElseThrow(() -> new BadRequestException("E-mail already exists"));
         verifyPasswordLength(userRequest);
         log.info("Setting and updating user request into database");
         var user = mapUserToUpdate(userId, userRequest, optionalUser);

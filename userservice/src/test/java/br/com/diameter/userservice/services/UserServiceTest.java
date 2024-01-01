@@ -75,7 +75,7 @@ public class UserServiceTest {
     void shouldThrowException_WhenEmailAlreadyExists() {
         var user = MockBuilder.createUser();
         var userRequest = MockBuilder.createUserRequest();
-        Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(user);
+        Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(Optional.of(user));
         var customException = Assertions.catchThrowable(() -> userService.createUser(userRequest));
         Assertions.assertThat(customException).isNotNull();
         Assertions.assertThat(customException).isInstanceOf(BadRequestException.class);
