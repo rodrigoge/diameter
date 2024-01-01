@@ -149,6 +149,21 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldUpdateUser_WhenRequestEmailIsDifferentUserObject() {
+        var userId = UUID.fromString("c0f0e810-06a9-4bf5-828f-380f71d38a8b");
+        var user = MockBuilder.createUser();
+        var userRequest = MockBuilder.updateUserRequest();
+        var userSaved = new User(userId, userRequest.name(), userRequest.email(), userRequest.password());
+        Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.findByEmail(userRequest.email())).thenReturn(null);
+        var userMapped = MockBuilder.createUser();
+        Mockito.when(userRepository.save(userSaved)).thenReturn(userMapped);
+        var userResponse = MockBuilder.createUserResponse();
+        Mockito.when(userMapper.toUserResponse(user)).thenReturn(userResponse);
+        Assertions.assertThat(userService.updateUser(userId, userRequest)).isEqualTo(userResponse);
+    }
+
+    @Test
     void shouldDeleteUser_WhenDeleteUserObject() {
         var userId = UUID.fromString("c0f0e810-06a9-4bf5-828f-380f71d38a8b");
         var user = MockBuilder.createUser();

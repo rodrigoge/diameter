@@ -27,6 +27,10 @@ public class MockBuilder {
         return new UserRequest("John Doe", "john.doe@mail.com", "12345678");
     }
 
+    public static UserRequest updateUserRequest() {
+        return new UserRequest("John Doe", "john.doe@email.com", "12345678");
+    }
+
     public static UserResponse createUserResponse() {
         return new UserResponse("John Doe", "john.doe@mail.com");
     }
