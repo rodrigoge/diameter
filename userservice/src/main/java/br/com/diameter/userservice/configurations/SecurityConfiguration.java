@@ -1,15 +1,14 @@
 package br.com.diameter.userservice.configurations;
 
-import br.com.diameter.userservice.filters.JwtAuthenticationFilter;
-import br.com.diameter.userservice.services.UserAuthService;
+import br.com.diameter.userservice.filters.AuthenticationFilter;
+import br.com.diameter.userservice.services.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,29 +23,26 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class RestTemplateConfiguration {
+public class SecurityConfiguration {
 
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private AuthenticationFilter authenticationFilter;
 
     @Autowired
-    private UserAuthService userAuthService;
+    private AuthorizationService authorizationService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/login/**").permitAll().anyRequest().authenticated())
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        var authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userAuthService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, "/api/v1/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
