@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,7 +45,8 @@ public class UserService {
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
         log.info("Starting the create user flow");
-        userRepository.findByEmail(userRequest.email()).orElseThrow(() -> new BadRequestException("E-mail already exists"));
+        var userWithEmailVerified = userRepository.findByEmail(userRequest.email());
+        verifyEmailAlreadyExists(userWithEmailVerified);
         verifyPasswordLength(userRequest);
         log.info("Mapping and saving user request into database");
         var user = userMapper.toUser(userRequest);
@@ -54,6 +56,15 @@ public class UserService {
         var userResponse = userMapper.toUserResponse(userSaved);
         log.info("Finishing the create user flow");
         return userResponse;
+    }
+
+    private void verifyEmailAlreadyExists(Optional<User> userWithEmailVerified) {
+        log.info("Verifying if e-mail already exists");
+        if (userWithEmailVerified != null &&
+                userWithEmailVerified.isPresent() &&
+                !userWithEmailVerified.get().getEmail().isEmpty()) {
+            throw new BadRequestException("E-mail already exists");
+        }
     }
 
     private void verifyPasswordLength(UserRequest user) {
