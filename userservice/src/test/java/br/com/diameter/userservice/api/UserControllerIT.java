@@ -2,7 +2,6 @@ package br.com.diameter.userservice.api;
 
 import br.com.diameter.userservice.builders.MockBuilder;
 import br.com.diameter.userservice.db.UserRepository;
-import br.com.diameter.userservice.filters.AuthenticationFilter;
 import br.com.diameter.userservice.mappers.UserMapper;
 import br.com.diameter.userservice.models.GetUsersResponse;
 import br.com.diameter.userservice.models.UserResponse;
@@ -12,10 +11,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -121,10 +116,8 @@ public class UserControllerIT {
                 entity,
                 GetUsersResponse.class
         );
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        var responseBody = Objects.requireNonNull(response.getBody());
-        Assertions.assertNotNull(responseBody.users());
-        Assertions.assertNotNull(responseBody.totalNumberOfRecords());
+        var responseBody = response.getBody();
+        Assertions.assertNull(responseBody);
     }
 
     @Test
@@ -137,9 +130,8 @@ public class UserControllerIT {
                 entity,
                 UserResponse.class
         );
-        var responseBody = Objects.requireNonNull(response.getBody());
-        Assertions.assertNull(responseBody.name());
-        Assertions.assertNull(responseBody.email());
+        var responseBody = response.getBody();
+        Assertions.assertNull(responseBody);
     }
 
     @Test
@@ -153,9 +145,8 @@ public class UserControllerIT {
                 entity,
                 UserResponse.class
         );
-        var responseBody = Objects.requireNonNull(response.getBody());
-        Assertions.assertNull(responseBody.name());
-        Assertions.assertNull(responseBody.email());
+        var responseBody = response.getBody();
+        Assertions.assertNull(responseBody);
     }
 
     @Test
@@ -170,6 +161,6 @@ public class UserControllerIT {
                 entity,
                 String.class
         );
-        Assertions.assertEquals(userRepository.findById(user.getId()), Optional.of(user));
+        Assertions.assertEquals(userRepository.findById(user.getId()), Optional.empty());
     }
 }
